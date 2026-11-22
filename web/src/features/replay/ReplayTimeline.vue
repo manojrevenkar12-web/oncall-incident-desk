@@ -22,7 +22,11 @@ const minutes = computed(() => {
 const duration = computed(() => minutesBetween(sc.value.outage.start, sc.value.outage.end));
 const x = (m: number) => `${((m - s.value.min) / (s.value.max - s.value.min + 1)) * 100}%`;
 const width = (a: number, b: number) => `${((b - a) / (s.value.max - s.value.min + 1)) * 100}%`;
-const ticks = computed(() => minutes.value.filter((m) => m % 5 === 0));
+const tickStep = computed(() => {
+  const n = s.value.max - s.value.min;
+  return n <= 50 ? 5 : n <= 100 ? 10 : n <= 180 ? 15 : 30;
+});
+const ticks = computed(() => minutes.value.filter((m) => m % tickStep.value === 0));
 
 const lanes = computed(() =>
   sc.value.lanes
@@ -103,7 +107,7 @@ const designLabel = (name: string) => props.designs.find((d) => d.name === name)
                 :aria-label="label(g)"
                 :initial="{ opacity: 0, scale: 0.4 }"
                 :animate="{ opacity: 1, scale: 1 }"
-                :transition="{ delay: 0.25 + (g.minute - s.min) * 0.035 + i * 0.004, duration: 0.25 }"
+                :transition="{ delay: 0.2 + ((g.minute - s.min) / (s.max - s.min + 1)) * 1.1 + i * 0.003, duration: 0.25 }"
                 @click="pick(lane.design, g)"
               >
                 <span v-if="g.events.length > 1" class="count">{{ g.events.length }}</span>
