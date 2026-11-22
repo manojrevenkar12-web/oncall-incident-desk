@@ -29,7 +29,9 @@ jobs:
       - name: tests (memory and Postgres 16)
         run: go test -race -p 1 ./...
       - name: replay into Postgres and memory, same decisions
-        run: go run ./cmd/desk replay -dsn "$DESK_TEST_DATABASE_URL" | tee replay.txt && grep -q "agree: true" replay.txt
+        run: |
+          go run ./cmd/desk replay -dsn "$DESK_TEST_DATABASE_URL" | tee replay.txt
+          grep -q "agree: true" replay.txt
 
   reports:
     runs-on: ubuntu-latest
@@ -50,10 +52,14 @@ jobs:
           assert new == old, "reports/dev.json does not reproduce"
           PY
       - name: the dev gates pass
-        run: python3 -c "import json,sys; g=json.load(open('reports/dev.json'))['gates']; bad=[x['name'] for x in g if not x['pass']]; print(bad); sys.exit(1 if bad else 0)"
+        run: |
+          python3 -c "import json,sys; g=json.load(open('reports/dev.json'))['gates']; bad=[x['name'] for x in g if not x['pass']]; print(bad); sys.exit(1 if bad else 0)"
       - name: the held-out study is locked
-        run: go build -o desk ./cmd/desk; ./desk study -world heldout; test $? -eq 3 || (echo "held-out must refuse to run again" && exit 1)
         shell: bash {0}
+        run: |
+          go build -o desk ./cmd/desk
+          ./desk study -world heldout
+          test $? -eq 3 || (echo "held-out must refuse to run again" && exit 1)
       - name: the README matches the reports
         run: |
           git checkout reports/dev.json
