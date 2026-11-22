@@ -1,0 +1,77 @@
+name: ci
+on:
+  push:
+  pull_request:
+
+jobs:
+  go:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: desk
+          POSTGRES_PASSWORD: desk
+          POSTGRES_DB: desk
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd="pg_isready -U desk" --health-interval=5s --health-timeout=3s --health-retries=20
+    env:
+      DESK_TEST_DATABASE_URL: postgres://desk:desk@127.0.0.1:5432/desk?sslmode=disable
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.24"
+      - name: gofmt
+        run: test -z "$(gofmt -l .)" || (gofmt -l . && exit 1)
+      - run: go vet ./...
+      - name: tests (memory and Postgres 16)
+        run: go test -race -p 1 ./...
+      - name: replay into Postgres and memory, same decisions
+        run: go run ./cmd/desk replay -dsn "$DESK_TEST_DATABASE_URL" | tee replay.txt && grep -q "agree: true" replay.txt
+
+  reports:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.24"
+      - name: the dev study reproduces the committed report
+        run: |
+          go run ./cmd/desk study -world dev
+          python3 - <<'PY'
+          import json, subprocess
+          new = json.load(open("reports/dev.json"))
+          old = json.loads(subprocess.check_output(["git", "show", "HEAD:reports/dev.json"]))
+          for r in (new, old):
+              r.pop("took")
+          assert new == old, "reports/dev.json does not reproduce"
+          PY
+      - name: the dev gates pass
+        run: python3 -c "import json,sys; g=json.load(open('reports/dev.json'))['gates']; bad=[x['name'] for x in g if not x['pass']]; print(bad); sys.exit(1 if bad else 0)"
+      - name: the held-out study is locked
+        run: go build -o desk ./cmd/desk; ./desk study -world heldout; test $? -eq 3 || (echo "held-out must refuse to run again" && exit 1)
+        shell: bash {0}
+      - name: the README matches the reports
+        run: |
+          git checkout reports/dev.json
+          go run ./cmd/desk readme
+          git diff --exit-code README.md
+
+  console:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - run: npm ci
+      - run: npm test
+      - run: npm run build

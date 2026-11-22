@@ -1,0 +1,8 @@
+{
+  "recall_min": 0.97,
+  "false_pages_share_of_status_quo_max": 0.1,
+  "mtta_share_of_status_quo_max": 1.0,
+  "notice_coverage_min": 0.9,
+  "notice_median_max_min": 3,
+  "bad_claims_per_100_posts_max": 1.0
+}

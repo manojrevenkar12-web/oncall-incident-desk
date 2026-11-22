@@ -1,0 +1,60 @@
+/* Theme tokens. The night-shift band (the replay) is the one loud place; everything else stays quiet. */
+:root {
+  /* light surfaces */
+  --paper: #f4f6f5;
+  --paper-raised: #ffffff;
+  --rule: #d9e0de;
+  --ink: #14262b;
+  --ink-soft: #3f5258;
+  --ink-muted: #66777c;
+
+  /* the night band */
+  --night: #12272c;
+  --night-raised: #1b353b;
+  --night-rule: #2c4a51;
+  --night-ink: #e9efed;
+  --night-muted: #9fb3b4;
+
+  /* signals: each kind of event keeps one colour everywhere */
+  --fault: #d2493c;
+  --fault-soft: #f3c9c3;
+  --page: #e8a33d;
+  --ack: #5fb3a8;
+  --post: #8fa6e8;
+  --refused: #c58fd9;
+  --pass: #2f6f4f;
+  --fail: #b3261e;
+
+  --font: "Instrument Sans Variable", "Instrument Sans", system-ui, sans-serif;
+  --step--1: 0.8125rem;
+  --step-0: 1rem;
+  --step-1: 1.25rem;
+  --step-2: 1.75rem;
+  --step-3: 2.75rem;
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2.5rem;
+  --space-7: 4rem;
+  --radius-s: 3px;
+  --radius-m: 8px;
+  --measure: 68ch;
+  --page-width: 72rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper: #0e1d21;
+    --paper-raised: #142a2f;
+    --rule: #26424a;
+    --ink: #e6eeec;
+    --ink-soft: #bfcfce;
+    --ink-muted: #8da2a3;
+    --night: #08161a;
+    --night-raised: #10252a;
+    --pass: #6cc29a;
+    --fail: #ff8a80;
+  }
+}

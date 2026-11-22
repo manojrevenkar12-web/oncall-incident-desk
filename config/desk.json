@@ -1,0 +1,40 @@
+{
+  "confirm_locations": 2,
+  "confirm_failures": 2,
+  "consecutive_runs": 1,
+  "noisy_share": 0.005,
+  "noisy_confirm_failures": 3,
+  "regional_runs": 4,
+  "recover_runs": 2,
+  "blip_filter": true,
+  "blip_share": 0.6,
+  "blip_others_max": 0.15,
+  "blip_min_checks": 8,
+  "blip_hold_min": 3,
+  "group_by_service": true,
+  "roll_up": true,
+  "roll_up_window_min": 10,
+  "reopen_grace_min": 15,
+  "stale_min": 5,
+  "escalation": [
+    {
+      "after_min": 0,
+      "target": "primary"
+    },
+    {
+      "after_min": 3,
+      "target": "primary"
+    },
+    {
+      "after_min": 6,
+      "target": "secondary"
+    },
+    {
+      "after_min": 15,
+      "target": "manager"
+    }
+  ],
+  "auto_publish": true,
+  "publish_minor": true,
+  "check_drafts": true
+}

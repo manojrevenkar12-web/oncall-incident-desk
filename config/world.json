@@ -1,0 +1,86 @@
+{
+  "name": "dev",
+  "days": 7,
+  "start": "2026-10-05T00:00:00Z",
+  "locations": ["eu-central-1", "eu-west-2", "us-east-1"],
+  "teams": [
+    {"id": "identity", "members": ["amara", "jonas", "lea", "omar"], "manager": "mira"},
+    {"id": "payments", "members": ["chen", "ines", "pavel", "sofia"], "manager": "tobias"},
+    {"id": "storefront", "members": ["elif", "felix", "hana", "luca", "nora"], "manager": "greta"},
+    {"id": "platform", "members": ["arjun", "bea", "dario", "yuki"], "manager": "karl"}
+  ],
+  "components": [
+    {"id": "login", "name": "Login", "public": true},
+    {"id": "accounts", "name": "Account settings", "public": true},
+    {"id": "payments", "name": "Payments", "public": true},
+    {"id": "billing", "name": "Billing portal", "public": true},
+    {"id": "website", "name": "Website", "public": true},
+    {"id": "checkout", "name": "Checkout", "public": true},
+    {"id": "search", "name": "Search", "public": true},
+    {"id": "catalog", "name": "Product catalog", "public": true},
+    {"id": "api", "name": "Public API", "public": true},
+    {"id": "webhooks", "name": "Webhooks", "public": true},
+    {"id": "notifications", "name": "Email notifications", "public": true},
+    {"id": "reporting", "name": "Reporting jobs", "public": false},
+    {"id": "admin", "name": "Admin console", "public": false}
+  ],
+  "services": [
+    {"id": "auth", "team": "identity", "rate_per_week": 0.7, "hosts": ["auth-1.prod.internal", "10.20.4.11"],
+     "checks": [{"id": "auth-login-api", "name": "POST /oauth/token", "component": "login"},
+                {"id": "auth-login-journey", "name": "Login journey (Playwright)", "component": "login"}]},
+    {"id": "users", "team": "identity", "depends_on": ["auth"], "rate_per_week": 0.4, "hosts": ["users-api.prod.internal"],
+     "checks": [{"id": "users-profile-api", "name": "GET /v1/me", "component": "accounts"},
+                {"id": "users-admin", "name": "Admin console loads", "component": "admin"}]},
+    {"id": "payments-gateway", "team": "payments", "rate_per_week": 0.7, "hosts": ["pay-gw.prod.internal"],
+     "checks": [{"id": "pay-authorize-api", "name": "POST /v1/payments/authorize", "component": "payments"},
+                {"id": "pay-refund-api", "name": "POST /v1/refunds", "component": "payments"}]},
+    {"id": "billing", "team": "payments", "depends_on": ["auth", "payments-gateway"], "rate_per_week": 0.5,
+     "checks": [{"id": "billing-portal", "name": "Billing portal journey", "component": "billing"},
+                {"id": "billing-invoices", "name": "Monthly invoice job heartbeat", "component": "reporting"}]},
+    {"id": "catalog", "team": "storefront", "rate_per_week": 0.6, "hosts": ["catalog-db.prod.internal"],
+     "checks": [{"id": "catalog-api", "name": "GET /v1/products", "component": "catalog"},
+                {"id": "catalog-images", "name": "Product images CDN", "component": "catalog"}]},
+    {"id": "web", "team": "storefront", "depends_on": ["auth", "catalog"], "rate_per_week": 0.6,
+     "checks": [{"id": "web-home", "name": "Home page (Playwright)", "component": "website"},
+                {"id": "web-product-page", "name": "Product page (Playwright)", "component": "website"}]},
+    {"id": "checkout", "team": "storefront", "depends_on": ["auth", "payments-gateway", "catalog"], "rate_per_week": 0.8,
+     "hosts": ["checkout-svc.prod.internal"],
+     "checks": [{"id": "checkout-cart-api", "name": "POST /v1/cart", "component": "checkout"},
+                {"id": "checkout-journey", "name": "Checkout journey (Playwright)", "component": "checkout"}]},
+    {"id": "search", "team": "storefront", "rate_per_week": 0.6, "hosts": ["search-es.prod.internal"],
+     "checks": [{"id": "search-api", "name": "GET /v1/search?q=lamp", "component": "search"}]},
+    {"id": "public-api", "team": "platform", "depends_on": ["auth"], "rate_per_week": 0.6, "hosts": ["api-gw.prod.internal"],
+     "checks": [{"id": "api-orders", "name": "GET /v2/orders", "component": "api"},
+                {"id": "api-status", "name": "GET /v2/health", "component": "api"}]},
+    {"id": "webhooks", "team": "platform", "depends_on": ["public-api"], "rate_per_week": 0.5,
+     "checks": [{"id": "webhooks-delivery", "name": "Webhook delivery heartbeat", "component": "webhooks"}]},
+    {"id": "notifications", "team": "platform", "rate_per_week": 0.5, "hosts": ["mailer.prod.internal"],
+     "checks": [{"id": "notify-email", "name": "Transactional email round trip", "component": "notifications"}]},
+    {"id": "reporting", "team": "platform", "rate_per_week": 0.6,
+     "checks": [{"id": "reporting-nightly", "name": "Nightly export heartbeat", "component": "reporting"}]}
+  ],
+  "outages": {
+    "kinds": {
+      "full":     {"weight": 0.40, "fail": 0.97, "median_min": 18, "sigma": 0.75},
+      "partial":  {"weight": 0.25, "fail": 0.92, "median_min": 25, "sigma": 0.75},
+      "regional": {"weight": 0.20, "fail": 0.95, "median_min": 35, "sigma": 0.70},
+      "degraded": {"weight": 0.15, "fail": 0.45, "median_min": 30, "sigma": 0.70}
+    },
+    "min_min": 4,
+    "max_min": 240,
+    "cascade_fail": 0.8
+  },
+  "blips": {"per_location_per_week": 3, "min_min": 2, "max_min": 6, "fail": 0.9},
+  "flakes": {"base": 0.0015, "flaky_share": 0.15, "flaky": 0.012},
+  "delivery": {"duplicate": 0.02},
+  "people": {
+    "miss_day": 0.04, "miss_night": 0.15, "fatigue_per_page": 0.01, "fatigue_cap": 0.30,
+    "ack_day_min": 2.5, "ack_night_min": 7, "ack_sigma": 0.6,
+    "post_chance": 0.7, "post_min": 12, "post_sigma": 0.7
+  },
+  "model": {
+    "down_two_plus": 0.9, "down_one": 0.03, "up_all_pass": 0.1,
+    "errors": {"unaffected_component": 0.05, "recovery_promise": 0.10, "unconfirmed_cause": 0.07, "internal_detail": 0.04},
+    "phrases_file": "config/phrases.dev.json"
+  }
+}

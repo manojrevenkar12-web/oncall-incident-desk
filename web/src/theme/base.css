@@ -1,0 +1,59 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+html {
+  font-family: var(--font);
+  font-size: 100%;
+  color: var(--ink);
+  background: var(--paper);
+  font-feature-settings: "tnum" 1;
+  -webkit-font-smoothing: antialiased;
+}
+body {
+  margin: 0;
+  line-height: 1.5;
+}
+h1,
+h2,
+h3 {
+  line-height: 1.15;
+  margin: 0;
+  font-weight: 620;
+  letter-spacing: -0.01em;
+}
+p {
+  margin: 0;
+  max-width: var(--measure);
+}
+a {
+  color: inherit;
+  text-underline-offset: 0.2em;
+}
+button {
+  font: inherit;
+  color: inherit;
+}
+:focus-visible {
+  outline: 2px solid var(--page);
+  outline-offset: 2px;
+}
+.wrap {
+  max-width: var(--page-width);
+  margin: 0 auto;
+  padding: 0 var(--space-5);
+}
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+  }
+}

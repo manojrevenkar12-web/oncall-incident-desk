@@ -1,0 +1,432 @@
+{
+  "services": [
+    {
+      "id": "auth",
+      "team": "identity",
+      "hosts": [
+        "auth-1.prod.internal",
+        "10.20.4.11"
+      ]
+    },
+    {
+      "id": "users",
+      "team": "identity",
+      "depends_on": [
+        "auth"
+      ],
+      "hosts": [
+        "users-api.prod.internal"
+      ]
+    },
+    {
+      "id": "payments-gateway",
+      "team": "payments",
+      "hosts": [
+        "pay-gw.prod.internal"
+      ]
+    },
+    {
+      "id": "billing",
+      "team": "payments",
+      "depends_on": [
+        "auth",
+        "payments-gateway"
+      ]
+    },
+    {
+      "id": "catalog",
+      "team": "storefront",
+      "hosts": [
+        "catalog-db.prod.internal"
+      ]
+    },
+    {
+      "id": "web",
+      "team": "storefront",
+      "depends_on": [
+        "auth",
+        "catalog"
+      ]
+    },
+    {
+      "id": "checkout",
+      "team": "storefront",
+      "depends_on": [
+        "auth",
+        "payments-gateway",
+        "catalog"
+      ],
+      "hosts": [
+        "checkout-svc.prod.internal"
+      ]
+    },
+    {
+      "id": "search",
+      "team": "storefront",
+      "hosts": [
+        "search-es.prod.internal"
+      ]
+    },
+    {
+      "id": "public-api",
+      "team": "platform",
+      "depends_on": [
+        "auth"
+      ],
+      "hosts": [
+        "api-gw.prod.internal"
+      ]
+    },
+    {
+      "id": "webhooks",
+      "team": "platform",
+      "depends_on": [
+        "public-api"
+      ]
+    },
+    {
+      "id": "notifications",
+      "team": "platform",
+      "hosts": [
+        "mailer.prod.internal"
+      ]
+    },
+    {
+      "id": "reporting",
+      "team": "platform"
+    }
+  ],
+  "components": [
+    {
+      "id": "login",
+      "name": "Login",
+      "public": true
+    },
+    {
+      "id": "accounts",
+      "name": "Account settings",
+      "public": true
+    },
+    {
+      "id": "payments",
+      "name": "Payments",
+      "public": true
+    },
+    {
+      "id": "billing",
+      "name": "Billing portal",
+      "public": true
+    },
+    {
+      "id": "website",
+      "name": "Website",
+      "public": true
+    },
+    {
+      "id": "checkout",
+      "name": "Checkout",
+      "public": true
+    },
+    {
+      "id": "search",
+      "name": "Search",
+      "public": true
+    },
+    {
+      "id": "catalog",
+      "name": "Product catalog",
+      "public": true
+    },
+    {
+      "id": "api",
+      "name": "Public API",
+      "public": true
+    },
+    {
+      "id": "webhooks",
+      "name": "Webhooks",
+      "public": true
+    },
+    {
+      "id": "notifications",
+      "name": "Email notifications",
+      "public": true
+    },
+    {
+      "id": "reporting",
+      "name": "Reporting jobs",
+      "public": false
+    },
+    {
+      "id": "admin",
+      "name": "Admin console",
+      "public": false
+    }
+  ],
+  "checks": [
+    {
+      "id": "api-orders",
+      "name": "GET /v2/orders",
+      "service": "public-api",
+      "component": "api",
+      "locations": [
+        "eu-central-1",
+        "eu-west-2",
+        "us-east-1"
+      ]
+    },
+    {
+      "id": "api-status",
+      "name": "GET /v2/health",
+      "service": "public-api",
+      "component": "api",
+      "locations": [
+        "eu-central-1",
+        "eu-west-2",
+        "us-east-1"
+      ]
+    },
+    {
+      "id": "auth-login-api",
+      "name": "POST /oauth/token",
+      "service": "auth",
+      "component": "login",
+      "locations": [
+        "eu-central-1",
+        "eu-west-2",
+        "us-east-1"
+      ]
+    },
+    {
+      "id": "auth-login-journey",
+      "name": "Login journey (Playwright)",
+      "service": "auth",
+      "component": "login",
+      "locations": [
+        "eu-central-1",
+        "eu-west-2",
+        "us-east-1"
+      ]
+    },
+    {
+      "id": "billing-invoices",
+      "name": "Monthly invoice job heartbeat",
+      "service": "billing",
+      "component": "reporting",
+      "locations": [
+        "eu-central-1",
+        "eu-west-2",
+        "us-east-1"
+      ]
+    },
+    {
+      "id": "billing-portal",
+      "name": "Billing portal journey",
+      "service": "billing",
+      "component": "billing",
+      "locations": [
+        "eu-central-1",
+        "eu-west-2",
+        "us-east-1"
+      ]
+    },
+    {
+      "id": "catalog-api",
+      "name": "GET /v1/products",
+      "service": "catalog",
+      "component": "catalog",
+      "locations": [
+        "eu-central-1",
+        "eu-west-2",
+        "us-east-1"
+      ]
+    },
+    {
+      "id": "catalog-images",
+      "name": "Product images CDN",
+      "service": "catalog",
+      "component": "catalog",
+      "locations": [
+        "eu-central-1",
+        "eu-west-2",
+        "us-east-1"
+      ]
+    },
+    {
+      "id": "checkout-cart-api",
+      "name": "POST /v1/cart",
+      "service": "checkout",
+      "component": "checkout",
+      "locations": [
+        "eu-central-1",
+        "eu-west-2",
+        "us-east-1"
+      ]
+    },
+    {
+      "id": "checkout-journey",
+      "name": "Checkout journey (Playwright)",
+      "service": "checkout",
+      "component": "checkout",
+      "locations": [
+        "eu-central-1",
+        "eu-west-2",
+        "us-east-1"
+      ]
+    },
+    {
+      "id": "notify-email",
+      "name": "Transactional email round trip",
+      "service": "notifications",
+      "component": "notifications",
+      "locations": [
+        "eu-central-1",
+        "eu-west-2",
+        "us-east-1"
+      ]
+    },
+    {
+      "id": "pay-authorize-api",
+      "name": "POST /v1/payments/authorize",
+      "service": "payments-gateway",
+      "component": "payments",
+      "locations": [
+        "eu-central-1",
+        "eu-west-2",
+        "us-east-1"
+      ]
+    },
+    {
+      "id": "pay-refund-api",
+      "name": "POST /v1/refunds",
+      "service": "payments-gateway",
+      "component": "payments",
+      "locations": [
+        "eu-central-1",
+        "eu-west-2",
+        "us-east-1"
+      ]
+    },
+    {
+      "id": "reporting-nightly",
+      "name": "Nightly export heartbeat",
+      "service": "reporting",
+      "component": "reporting",
+      "locations": [
+        "eu-central-1",
+        "eu-west-2",
+        "us-east-1"
+      ]
+    },
+    {
+      "id": "search-api",
+      "name": "GET /v1/search?q=lamp",
+      "service": "search",
+      "component": "search",
+      "locations": [
+        "eu-central-1",
+        "eu-west-2",
+        "us-east-1"
+      ]
+    },
+    {
+      "id": "users-admin",
+      "name": "Admin console loads",
+      "service": "users",
+      "component": "admin",
+      "locations": [
+        "eu-central-1",
+        "eu-west-2",
+        "us-east-1"
+      ]
+    },
+    {
+      "id": "users-profile-api",
+      "name": "GET /v1/me",
+      "service": "users",
+      "component": "accounts",
+      "locations": [
+        "eu-central-1",
+        "eu-west-2",
+        "us-east-1"
+      ]
+    },
+    {
+      "id": "web-home",
+      "name": "Home page (Playwright)",
+      "service": "web",
+      "component": "website",
+      "locations": [
+        "eu-central-1",
+        "eu-west-2",
+        "us-east-1"
+      ]
+    },
+    {
+      "id": "web-product-page",
+      "name": "Product page (Playwright)",
+      "service": "web",
+      "component": "website",
+      "locations": [
+        "eu-central-1",
+        "eu-west-2",
+        "us-east-1"
+      ]
+    },
+    {
+      "id": "webhooks-delivery",
+      "name": "Webhook delivery heartbeat",
+      "service": "webhooks",
+      "component": "webhooks",
+      "locations": [
+        "eu-central-1",
+        "eu-west-2",
+        "us-east-1"
+      ]
+    }
+  ],
+  "teams": [
+    {
+      "id": "identity",
+      "members": [
+        "amara",
+        "jonas",
+        "lea",
+        "omar"
+      ],
+      "manager": "mira"
+    },
+    {
+      "id": "payments",
+      "members": [
+        "chen",
+        "ines",
+        "pavel",
+        "sofia"
+      ],
+      "manager": "tobias"
+    },
+    {
+      "id": "storefront",
+      "members": [
+        "elif",
+        "felix",
+        "hana",
+        "luca",
+        "nora"
+      ],
+      "manager": "greta"
+    },
+    {
+      "id": "platform",
+      "members": [
+        "arjun",
+        "bea",
+        "dario",
+        "yuki"
+      ],
+      "manager": "karl"
+    }
+  ],
+  "rotation_start": "2026-10-05T00:00:00Z"
+}

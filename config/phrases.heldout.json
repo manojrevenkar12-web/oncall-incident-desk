@@ -1,0 +1,33 @@
+{
+  "clean": [
+    "{components} {is} having trouble{region}. We are looking at it now.",
+    "We know some of you can't use {components}{region} right now and we're working on it.",
+    "Heads up: {components} {is} failing for some customers{region}. Investigation under way.",
+    "An issue is affecting {components}{region}. We're investigating."
+  ],
+  "resolved": [
+    "All clear: {components} {is} healthy again.",
+    "{components} recovered and {is} operating normally."
+  ],
+  "errors": {
+    "unaffected_component": ["(the clean line names one more component)"],
+    "recovery_promise": [
+      " We should have it fixed before lunch.",
+      " Give us twenty minutes.",
+      " Things will be back to normal soon.",
+      " Recovery is planned for 16:00 UTC.",
+      " We expect service to return within the hour."
+    ],
+    "unconfirmed_cause": [
+      " A database failover is behind this.",
+      " This follows this morning's config rollout.",
+      " The trigger was a certificate that expired overnight.",
+      " Our cloud provider confirmed a problem on their side, which is the reason."
+    ],
+    "internal_detail": [
+      " The primary node db-main-2 stopped answering.",
+      " {host} ran out of memory.",
+      " Health checks on 10.20.4.17 are timing out."
+    ]
+  }
+}

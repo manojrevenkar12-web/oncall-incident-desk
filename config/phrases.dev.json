@@ -1,0 +1,36 @@
+{
+  "clean": [
+    "We are investigating problems with {components}{region}.",
+    "{components} {is} currently returning errors{region}. Our team is looking into it.",
+    "Some customers may see failures when using {components}{region}. We are on it and will share more here.",
+    "We're seeing elevated error rates on {components}{region} and are investigating.",
+    "Customers may be unable to use {components}{region}. Engineers are working on it."
+  ],
+  "resolved": [
+    "{components} {is} working normally again.",
+    "The problem affecting {components} has been resolved.",
+    "We have resolved the issue with {components}. Thanks for your patience."
+  ],
+  "errors": {
+    "unaffected_component": ["(the clean line names one more component)"],
+    "recovery_promise": [
+      " We expect a fix within 30 minutes.",
+      " Service should be back shortly.",
+      " The ETA for recovery is 45 minutes.",
+      " We aim to restore service by 15:30 UTC.",
+      " Full recovery is expected in about an hour.",
+      " We hope to have this sorted soon."
+    ],
+    "unconfirmed_cause": [
+      " This is caused by a database failover.",
+      " It looks like a faulty deployment, which we are rolling back.",
+      " It appears to be due to an upstream provider.",
+      " Our provider's network is having a bad day."
+    ],
+    "internal_detail": [
+      " Requests to {host} are failing with ECONNREFUSED.",
+      " The {host} pool is unhealthy.",
+      " Pods for {service} are in CrashLoopBackOff."
+    ]
+  }
+}
